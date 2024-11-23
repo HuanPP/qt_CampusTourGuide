@@ -1,0 +1,5 @@
+/Users/huan/ctg/build/CMakeFiles/CampusTourGuide.dir
+/Users/huan/ctg/build/CMakeFiles/edit_cache.dir
+/Users/huan/ctg/build/CMakeFiles/rebuild_cache.dir
+/Users/huan/ctg/build/CMakeFiles/CampusTourGuide_autogen_timestamp_deps.dir
+/Users/huan/ctg/build/CMakeFiles/CampusTourGuide_autogen.dir

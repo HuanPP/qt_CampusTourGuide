@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1200</width>
+    <height>800</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>校园导游系统</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QHBoxLayout" name="mainLayout">
+    <item>
+     <!-- 左侧布局：地图视图 -->
+     <layout class="QVBoxLayout" name="leftLayout">
+      <item>
+       <!-- 地图视图 -->
+       <widget class="QGraphicsView" name="graphView"/>
+      </item>
+      <item>
+       <!-- 信息显示区域 -->
+       <widget class="QLabel" name="infoLabel">
+        <property name="frameShape">
+         <enum>QFrame::StyledPanel</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Sunken</enum>
+        </property>
+        <property name="text">
+         <string>点击景点显示信息</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <!-- 右侧布局：控件区域 -->
+     <layout class="QVBoxLayout" name="rightLayout">
+      <item>
+       <!-- 添加景点 -->
+       <layout class="QVBoxLayout" name="addNodeLayout">
+        <item>
+         <widget class="QLineEdit" name="nodeNameInput">
+          <property name="placeholderText">
+           <string>输入景点名称</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QTextEdit" name="nodeInfoInput">
+          <property name="placeholderText">
+           <string>输入景点信息</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="addNodeButton">
+          <property name="text">
+           <string>添加景点</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <!-- 添加/删除路径 -->
+       <layout class="QVBoxLayout" name="addEdgeLayout">
+        <item>
+         <widget class="QLabel" name="addEdgeLabel">
+          <property name="text">
+           <string>添加/删除路径</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="edgeInputLayout">
+          <item>
+           <widget class="QLineEdit" name="edgeStartInput">
+            <property name="placeholderText">
+             <string>起点名称</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="edgeEndInput">
+            <property name="placeholderText">
+             <string>终点名称</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="edgeButtonLayout">
+          <item>
+           <widget class="QPushButton" name="addEdgeButton">
+            <property name="text">
+             <string>添加路径</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="deleteEdgeButton">
+            <property name="text">
+             <string>删除路径</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <!-- 算法操作 -->
+       <layout class="QHBoxLayout" name="buttonLayout">
+        <item>
+         <widget class="QLineEdit" name="startPointInput">
+          <property name="placeholderText">
+           <string>起点名称</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="endPointInput">
+          <property name="placeholderText">
+           <string>终点名称</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="actionButtonLayout">
+        <item>
+         <widget class="QPushButton" name="findShortestPathButton">
+          <property name="text">
+           <string>查询最短路径</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="dfsButton">
+          <property name="text">
+           <string>展示DFS路径</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="mstButton">
+          <property name="text">
+           <string>最小生成树</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <!-- 输出显示 -->
+       <widget class="QTextEdit" name="outputDisplay">
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

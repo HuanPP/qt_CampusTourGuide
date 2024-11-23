@@ -1,0 +1,3 @@
+# Hashes of file build rules.
+391c0b96b6b0bfaa327ad5a1a79f981d CMakeFiles/CampusTourGuide_autogen
+edd3ec518accc58fee83d34028c5e0e0 CampusTourGuide_autogen/timestamp

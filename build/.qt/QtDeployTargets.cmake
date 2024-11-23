@@ -1,0 +1,2 @@
+set(__QT_DEPLOY_TARGET_CampusTourGuide_FILE /Users/huan/ctg/build/CampusTourGuide.app/Contents/MacOS/CampusTourGuide)
+set(__QT_DEPLOY_TARGET_CampusTourGuide_TYPE EXECUTABLE)

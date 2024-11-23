@@ -1,0 +1,5 @@
+/Users/huan/ctg/build/Desktop_arm_darwin_generic_mach_o_64bit-Debug/CMakeFiles/CampusTourGuide.dir
+/Users/huan/ctg/build/Desktop_arm_darwin_generic_mach_o_64bit-Debug/CMakeFiles/edit_cache.dir
+/Users/huan/ctg/build/Desktop_arm_darwin_generic_mach_o_64bit-Debug/CMakeFiles/rebuild_cache.dir
+/Users/huan/ctg/build/Desktop_arm_darwin_generic_mach_o_64bit-Debug/CMakeFiles/CampusTourGuide_autogen_timestamp_deps.dir
+/Users/huan/ctg/build/Desktop_arm_darwin_generic_mach_o_64bit-Debug/CMakeFiles/CampusTourGuide_autogen.dir
