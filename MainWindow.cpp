@@ -20,6 +20,8 @@
 #include <QTextEdit>
 #include <QLabel>
 #include <QGraphicsView>
+#include <QTimer>
+#include <QFileDialog>
 
 DraggableEllipseItem::DraggableEllipseItem(int nodeId, const QString& labelText, QGraphicsItem* parent)
     : QObject(), QGraphicsEllipseItem(parent), nodeId(nodeId), moved(false) {
@@ -59,7 +61,7 @@ void DraggableEllipseItem::mouseReleaseEvent(QGraphicsSceneMouseEvent* event) {
 }
 
 MainWindow::MainWindow(QWidget* parent)
-    : QMainWindow(parent), ui(new Ui::MainWindow), scene(new QGraphicsScene(this)) {
+    : QMainWindow(parent), ui(new Ui::MainWindow), scene(new QGraphicsScene(this)), dfsTimer(nullptr) {
     ui->setupUi(this);
 
     // 设置地图范围
@@ -68,6 +70,7 @@ MainWindow::MainWindow(QWidget* parent)
 
     // 连接信号和槽
     connect(ui->addNodeButton, &QPushButton::clicked, this, &MainWindow::on_addNodeButton_clicked);
+    connect(ui->deleteNodeButton, &QPushButton::clicked, this, &MainWindow::on_deleteNodeButton_clicked);
     connect(ui->addEdgeButton, &QPushButton::clicked, this, &MainWindow::on_addEdgeButton_clicked);
     connect(ui->deleteEdgeButton, &QPushButton::clicked, this, &MainWindow::on_deleteEdgeButton_clicked);
     connect(scene, &QGraphicsScene::selectionChanged, this, &MainWindow::on_nodeSelected);
@@ -76,6 +79,10 @@ MainWindow::MainWindow(QWidget* parent)
     connect(ui->findShortestPathButton, &QPushButton::clicked, this, &MainWindow::on_findShortestPathButton_clicked);
     connect(ui->dfsButton, &QPushButton::clicked, this, &MainWindow::on_dfsButton_clicked);
     connect(ui->mstButton, &QPushButton::clicked, this, &MainWindow::on_mstButton_clicked);
+
+    // 连接导入导出按钮
+    connect(ui->importGraphButton, &QPushButton::clicked, this, &MainWindow::on_importGraphButton_clicked);
+    connect(ui->exportGraphButton, &QPushButton::clicked, this, &MainWindow::on_exportGraphButton_clicked);
 }
 
 MainWindow::~MainWindow() {
@@ -83,20 +90,25 @@ MainWindow::~MainWindow() {
 }
 
 void MainWindow::on_addNodeButton_clicked() {
+    resetScene();
+
     QString nodeName = ui->nodeNameInput->text().trimmed();
     QString nodeInfo = ui->nodeInfoInput->toPlainText().trimmed();
 
+    // 检查节点名称和信息是否为空
     if (nodeName.isEmpty() || nodeInfo.isEmpty()) {
         QMessageBox::warning(this, "警告", "节点名称和信息不能为空！");
         return;
     }
 
+    // 检查节点是否已存在
     int existingNodeId = graph.getVexIndex(nodeName.toStdString());
     if (existingNodeId != -1) {
         QMessageBox::warning(this, "警告", "节点名称已存在！");
         return;
     }
 
+    // 添加节点到图结构
     Vex newVex;
     newVex.name = nodeName.toStdString();
     newVex.introduction = nodeInfo.toStdString();
@@ -107,10 +119,11 @@ void MainWindow::on_addNodeButton_clicked() {
         return;
     }
 
-    // 创建 DraggableEllipseItem 并添加到场景
+    // 创建可拖动节点
     DraggableEllipseItem* ellipse = new DraggableEllipseItem(nodeId, nodeName);
     ellipse->setRect(-20, -20, 40, 40);
 
+    // 随机分配位置
     QRectF sceneRect = scene->sceneRect();
     static std::mt19937 generator(static_cast<unsigned int>(std::chrono::system_clock::now().time_since_epoch().count()));
     std::uniform_real_distribution<double> distributionX(sceneRect.left(), sceneRect.right());
@@ -120,21 +133,78 @@ void MainWindow::on_addNodeButton_clicked() {
     ellipse->setBrush(Qt::green);
     scene->addItem(ellipse);
 
-    // 插入到 nodeItems 中
+    // 插入到节点管理映射
     nodeItems[nodeId] = ellipse;
-    qDebug() << "节点添加成功，ID：" << nodeId << "名称：" << nodeName;
 
+    // 绑定移动信号到槽函数
     connect(ellipse, &DraggableEllipseItem::positionChanged, this, &MainWindow::on_sceneNodeMoved);
+
+    qDebug() << "节点添加成功，ID：" << nodeId << "名称：" << nodeName;
 
     // 清空输入框
     ui->nodeNameInput->clear();
     ui->nodeInfoInput->clear();
 }
 
+void MainWindow::on_deleteNodeButton_clicked() {
+    resetScene();
+
+    QString nodeName = ui->nodeNameInput->text().trimmed();
+
+    if (nodeName.isEmpty()) {
+        QMessageBox::warning(this, "警告", "请输入要删除的节点名称！");
+        return;
+    }
+
+    int nodeId = graph.getVexIndex(nodeName.toStdString());
+    if (nodeId == -1) {
+        QMessageBox::warning(this, "警告", "节点不存在！");
+        return;
+    }
+
+    // 删除与该节点相关的边
+    auto adjacencyList = graph.getAdjacencyList();
+    if (adjacencyList.find(nodeId) != adjacencyList.end()) {
+        for (const auto& neighbor : adjacencyList[nodeId]) {
+            int neighborId = neighbor.first;
+            int minId = std::min(nodeId, neighborId);
+            int maxId = std::max(nodeId, neighborId);
+
+            // 删除边的图形表示
+            if (edgeItems.find({minId, maxId}) != edgeItems.end()) {
+                scene->removeItem(edgeItems[{minId, maxId}]);
+                delete edgeItems[{minId, maxId}];
+                edgeItems.erase({minId, maxId});
+            }
+
+            // 删除边权重的文本
+            if (edgeWeightTexts.find({minId, maxId}) != edgeWeightTexts.end()) {
+                scene->removeItem(edgeWeightTexts[{minId, maxId}]);
+                delete edgeWeightTexts[{minId, maxId}];
+                edgeWeightTexts.erase({minId, maxId});
+            }
+        }
+    }
+
+    // 从图数据结构中删除节点
+    graph.removeVex(nodeId);
+
+    // 删除节点的图形表示
+    if (nodeItems.find(nodeId) != nodeItems.end()) {
+        scene->removeItem(nodeItems[nodeId]);
+        delete nodeItems[nodeId];
+        nodeItems.erase(nodeId);
+    }
+
+    ui->nodeNameInput->clear();
+    ui->nodeInfoInput->clear();
+}
+
 void MainWindow::on_addEdgeButton_clicked() {
+    resetScene();
     // 检查是否至少有两个节点
-    if (graph.getAllVexs().size() < 6) {
-        QMessageBox::warning(this, "警告", "节点少于6个时，无法添加边！");
+    if (graph.getAllVexs().size() < 2) {
+        QMessageBox::warning(this, "警告", "节点少于2个时，无法添加边！");
         return;
     }
 
@@ -198,6 +268,7 @@ void MainWindow::on_addEdgeButton_clicked() {
 }
 
 void MainWindow::on_deleteEdgeButton_clicked() {
+    resetScene();
     QString startName = ui->edgeStartInput->text().trimmed();
     QString endName = ui->edgeEndInput->text().trimmed();
 
@@ -288,17 +359,18 @@ void MainWindow::on_nodeSelected() {
             int idx = item->getNodeId();
             Vex vex = graph.getVex(idx);
 
-            ui->infoLabel->setText(QString("景点名称：%1\n介绍：%2\n门票信息：%3")
+            ui->infoLabel->setText(QString("景点名称：%1\n介绍：%2\n")
                                        .arg(QString::fromStdString(vex.name))
-                                       .arg(QString::fromStdString(vex.introduction))
-                                       .arg(QString::fromStdString(vex.ticketInfo)));
+                                       .arg(QString::fromStdString(vex.introduction)));
+
         }
     }
 }
 
 void MainWindow::on_findShortestPathButton_clicked() {
-    if (graph.getAllVexs().size() < 6) {
-        QMessageBox::warning(this, "警告", "节点少于6个时，无法查询最短路径！");
+    resetScene();
+    if (graph.getAllVexs().size() < 2) {
+        QMessageBox::warning(this, "警告", "节点少于2个时，无法查询最短路径！");
         return;
     }
 
@@ -388,9 +460,8 @@ void MainWindow::on_findShortestPathButton_clicked() {
 }
 
 void MainWindow::on_dfsButton_clicked() {
-    // 判断节点数是否足够
-    if (graph.getAllVexs().size() < 6) {
-        QMessageBox::warning(this, "警告", "节点少于6个时，无法执行DFS！");
+    if (graph.getAllVexs().size() < 1) {
+        QMessageBox::warning(this, "警告", "图中没有节点，无法执行DFS！");
         return;
     }
 
@@ -402,10 +473,20 @@ void MainWindow::on_dfsButton_clicked() {
         return;
     }
 
+    // 如果正在运行DFS展示，先停止
+    if (dfsTimer && dfsTimer->isActive()) {
+        dfsTimer->stop();
+        delete dfsTimer;
+        dfsTimer = nullptr;
+    }
+
+    resetScene();
+
     auto adjacencyList = graph.getAdjacencyList();
-    std::set<int> visited;                      // 记录已访问节点
-    std::vector<std::vector<int>> allPaths;     // 存储所有路径
-    std::vector<int> currentPath;               // 当前路径
+    std::set<int> visited;
+    std::vector<int> currentPath;
+
+    dfsPaths.clear();
 
     // 深度优先搜索的递归函数
     std::function<void(int)> dfs = [&](int current) {
@@ -420,52 +501,72 @@ void MainWindow::on_dfsButton_clicked() {
             }
         }
 
-        if (!hasUnvisited) { // 如果到达叶子节点，保存路径
-            allPaths.push_back(currentPath);
+        if (!hasUnvisited) {
+            dfsPaths.push_back(currentPath);
         }
 
-        visited.erase(current);  // 回溯
-        currentPath.pop_back();  // 回溯
+        visited.erase(current);
+        currentPath.pop_back();
     };
 
     // 执行DFS
     dfs(startIdx);
 
-    // 随机生成颜色，用于路径标注
-    static std::mt19937 generator(static_cast<unsigned int>(std::chrono::system_clock::now().time_since_epoch().count()));
-    std::uniform_int_distribution<int> distribution(0, 255);
-
-    for (size_t i = 0; i < allPaths.size(); ++i) {
-        QColor pathColor(distribution(generator), distribution(generator), distribution(generator));
-
-        for (size_t j = 0; j < allPaths[i].size() - 1; ++j) {
-            int node1 = allPaths[i][j];
-            int node2 = allPaths[i][j + 1];
-            int minId = std::min(node1, node2);
-            int maxId = std::max(node1, node2);
-            auto edgeKey = std::make_pair(minId, maxId);
-
-            if (edgeItems.find(edgeKey) != edgeItems.end()) {
-                edgeItems[edgeKey]->setPen(QPen(pathColor, 4));
-            }
-        }
+    if (dfsPaths.empty()) {
+        ui->outputDisplay->setText("未找到任何DFS路径！");
+        return;
     }
 
-    // 在界面上显示路径结果
-    QString result = "DFS所有路径：\n";
-    for (const auto& path : allPaths) {
-        for (size_t i = 0; i < path.size(); ++i) {
-            result += QString::fromStdString(graph.getVex(path[i]).name);
-            if (i != path.size() - 1) {
-                result += " -> ";
+    // 开始路径展示
+    dfsPathIndex = 0;
+    isDfsRunning = true;
+
+    dfsTimer = new QTimer(this);
+    connect(dfsTimer, &QTimer::timeout, this, [this]() {
+        if (!dfsPaths.empty() && dfsPathIndex < static_cast<int>(dfsPaths.size())) {
+            // 重置所有边的颜色
+            for (auto& edgePair : edgeItems) {
+                edgePair.second->setPen(QPen(Qt::gray, 2));
+            }
+
+            // 获取当前路径并高亮显示
+            const auto& path = dfsPaths[dfsPathIndex];
+            QColor pathColor(Qt::red);
+            for (size_t i = 0; i < path.size() - 1; ++i) {
+                int node1 = path[i];
+                int node2 = path[i + 1];
+                int minId = std::min(node1, node2);
+                int maxId = std::max(node1, node2);
+                auto edgeKey = std::make_pair(minId, maxId);
+
+                if (edgeItems.find(edgeKey) != edgeItems.end()) {
+                    edgeItems[edgeKey]->setPen(QPen(pathColor, 4));
+                }
+            }
+
+            // 显示路径的文字信息
+            QString result = "当前路径：";
+            for (size_t i = 0; i < path.size(); ++i) {
+                result += QString::fromStdString(graph.getVex(path[i]).name);
+                if (i != path.size() - 1) {
+                    result += " -> ";
+                }
+            }
+            ui->outputDisplay->setText(result);
+
+            // 准备展示下一条路径
+            dfsPathIndex++;
+            if (dfsPathIndex >= static_cast<int>(dfsPaths.size())) {
+                dfsPathIndex = 0; // 循环展示
             }
         }
-        result += "\n";
-    }
-    ui->outputDisplay->setText(result);
+    });
+
+    dfsTimer->start(2000); // 每2秒切换一条路径
 }
 
 void MainWindow::on_mstButton_clicked() {
+    resetScene();
     // 实现Kruskal算法计算最小生成树
     auto allEdges = graph.getAllEdges();
     std::sort(allEdges.begin(), allEdges.end(), [](const Edge& e1, const Edge& e2) {
@@ -517,4 +618,162 @@ void MainWindow::on_mstButton_clicked() {
             edgeItems[edgeKey]->setPen(QPen(Qt::green, 4));
         }
     }
+}
+
+void MainWindow::resetScene() {
+    // 停止定时器（如果正在运行）
+    if (dfsTimer && dfsTimer->isActive()) {
+        dfsTimer->stop();
+        delete dfsTimer;
+        dfsTimer = nullptr;
+    }
+
+    // 重置所有边的颜色
+    for (auto& edgePair : edgeItems) {
+        edgePair.second->setPen(QPen(Qt::gray, 2));
+    }
+
+    isDfsRunning = false; // 标志重置
+    dfsPaths.clear();     // 清空路径
+}
+
+void MainWindow::on_importGraphButton_clicked() {
+    QString fileName = QFileDialog::getOpenFileName(this, "导入图数据", "", "文本文件 (*.txt);;所有文件 (*)");
+    if (fileName.isEmpty()) {
+        return;
+    }
+
+    QFile file(fileName);
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        QMessageBox::warning(this, "错误", "无法打开文件！");
+        return;
+    }
+
+    clearGraph();
+
+    QTextStream in(&file);
+    int nodeCount;
+    in >> nodeCount;
+    in.readLine();
+
+    // 读取节点信息
+    for (int i = 0; i < nodeCount; ++i) {
+        QString nodeName = in.readLine().trimmed();
+        QString nodeInfo = in.readLine().trimmed();
+
+        // 添加节点到图结构
+        Vex newVex;
+        newVex.name = nodeName.toStdString();
+        newVex.introduction = nodeInfo.toStdString();
+        newVex.ticketInfo = "暂无门票信息";
+        int nodeId = graph.insertVex(newVex);
+
+        // 创建可拖动节点
+        DraggableEllipseItem* ellipse = new DraggableEllipseItem(nodeId, nodeName);
+        ellipse->setRect(-20, -20, 40, 40);
+
+        // 随机分配位置
+        QRectF sceneRect = scene->sceneRect();
+        static std::mt19937 generator(static_cast<unsigned int>(std::chrono::system_clock::now().time_since_epoch().count()));
+        std::uniform_real_distribution<double> distributionX(sceneRect.left(), sceneRect.right());
+        std::uniform_real_distribution<double> distributionY(sceneRect.top(), sceneRect.bottom());
+        QPointF position(distributionX(generator), distributionY(generator));
+        ellipse->setPos(position);
+        ellipse->setBrush(Qt::green);
+        scene->addItem(ellipse);
+
+        // 插入到节点管理映射
+        nodeItems[nodeId] = ellipse;
+
+        // 绑定移动信号到槽函数
+        connect(ellipse, &DraggableEllipseItem::positionChanged, this, &MainWindow::on_sceneNodeMoved);
+    }
+
+    int edgeCount;
+    in >> edgeCount;
+    in.readLine();
+
+    // 读取边信息
+    for (int i = 0; i < edgeCount; ++i) {
+        QString line = in.readLine().trimmed();
+        QStringList parts = line.split(" ");
+        if (parts.size() < 2) continue;
+
+        QString startName = parts[0];
+        QString endName = parts[1];
+
+        int startId = graph.getVexIndex(startName.toStdString());
+        int endId = graph.getVexIndex(endName.toStdString());
+
+        if (startId == -1 || endId == -1) continue;
+
+        int minId = std::min(startId, endId);
+        int maxId = std::max(startId, endId);
+
+        QPointF pos1 = nodeItems[startId]->pos();
+        QPointF pos2 = nodeItems[endId]->pos();
+        double distance = calculateDistance(pos1, pos2);
+
+        // 添加到图数据结构中
+        graph.addEdge(minId, maxId, distance);
+
+        // 绘制边
+        QPen pen(Qt::gray);
+        pen.setWidth(2);
+        QGraphicsLineItem* lineItem = scene->addLine(QLineF(pos1, pos2), pen);
+        edgeItems[{minId, maxId}] = lineItem;
+
+        // 显示边权重
+        QPointF midPoint = (pos1 + pos2) / 2;
+        QGraphicsTextItem* text = scene->addText(QString::number(distance, 'f', 2));
+        text->setDefaultTextColor(Qt::blue);
+        text->setPos(midPoint);
+        edgeWeightTexts[{minId, maxId}] = text;
+    }
+
+    file.close();
+}
+
+void MainWindow::on_exportGraphButton_clicked() {
+    QString fileName = QFileDialog::getSaveFileName(this, "导出图数据", "", "文本文件 (*.txt);;所有文件 (*)");
+    if (fileName.isEmpty()) {
+        return;
+    }
+
+    QFile file(fileName);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        QMessageBox::warning(this, "错误", "无法创建文件！");
+        return;
+    }
+
+    QTextStream out(&file);
+
+    // 写入节点信息
+    auto allVexs = graph.getAllVexs();
+    out << allVexs.size() << "\n";
+    for (const auto& vex : allVexs) {
+        out << QString::fromStdString(vex.name) << "\n";
+        out << QString::fromStdString(vex.introduction) << "\n";
+    }
+
+    // 写入边信息
+    auto allEdges = graph.getAllEdges();
+    out << allEdges.size() << "\n";
+    for (const auto& edge : allEdges) {
+        out << QString::fromStdString(graph.getVex(edge.vex1).name) << " "
+            << QString::fromStdString(graph.getVex(edge.vex2).name) << "\n";
+    }
+
+    file.close();
+}
+
+void MainWindow::clearGraph() {
+    // 清除场景中的所有项目
+    scene->clear();
+
+    // 清空数据结构
+    nodeItems.clear();
+    edgeItems.clear();
+    edgeWeightTexts.clear();
+    graph.clearGraph();
 }

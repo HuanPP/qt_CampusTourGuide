@@ -65,11 +65,22 @@
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="addNodeButton">
-          <property name="text">
-           <string>添加景点</string>
-          </property>
-         </widget>
+         <layout class="QHBoxLayout" name="addDeleteNodeLayout">
+          <item>
+           <widget class="QPushButton" name="addNodeButton">
+            <property name="text">
+             <string>添加景点</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="deleteNodeButton">
+            <property name="text">
+             <string>删除景点</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </item>
        </layout>
       </item>
@@ -160,6 +171,25 @@
          <widget class="QPushButton" name="mstButton">
           <property name="text">
            <string>最小生成树</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <!-- 导入/导出图 -->
+       <layout class="QHBoxLayout" name="importExportLayout">
+        <item>
+         <widget class="QPushButton" name="importGraphButton">
+          <property name="text">
+           <string>导入图</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="exportGraphButton">
+          <property name="text">
+           <string>导出图</string>
           </property>
          </widget>
         </item>

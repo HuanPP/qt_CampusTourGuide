@@ -13,8 +13,11 @@
 #include <QLineEdit>
 #include <QTextEdit>
 #include <QGraphicsView>
-
+#include <QTimer>
 #include <functional>
+#include <QFileDialog>
+#include <QFile>
+#include <QTextStream>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -51,6 +54,7 @@ public:
 
 private slots:
     void on_addNodeButton_clicked();
+    void on_deleteNodeButton_clicked();
     void on_addEdgeButton_clicked();
     void on_deleteEdgeButton_clicked();
     void on_nodeSelected();
@@ -58,6 +62,8 @@ private slots:
     void on_findShortestPathButton_clicked();
     void on_dfsButton_clicked();
     void on_mstButton_clicked();
+    void on_importGraphButton_clicked();
+    void on_exportGraphButton_clicked();
 
 private:
     Ui::MainWindow* ui;
@@ -68,8 +74,15 @@ private:
     std::map<std::pair<int, int>, QGraphicsLineItem*> edgeItems;
     std::map<std::pair<int, int>, QGraphicsTextItem*> edgeWeightTexts;
 
+    QTimer* dfsTimer; // 定时器用于控制路径展示
+    int dfsPathIndex; // 当前展示的路径索引
+    bool isDfsRunning; // 标识是否正在展示DFS路径
+    std::vector<std::vector<int>> dfsPaths; // 存储DFS所有路径
+    void resetScene(); // 恢复场景到初始状态
+
     void updateEdges();
     double calculateDistance(const QPointF& p1, const QPointF& p2);
+    void clearGraph(); // 清空当前图形和数据
 };
 
 #endif // MAINWINDOW_H

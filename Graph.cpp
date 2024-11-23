@@ -34,9 +34,17 @@ bool Graph::removeVex(int vexNum) {
     }
     return false;
 }
+
 void Graph::clearEdges() {
     edges.clear();
     edgeWeights.clear();
+}
+
+void Graph::clearGraph() {
+    vexs.clear();
+    edges.clear();
+    edgeWeights.clear();
+    vexCounter = 0; // 重置节点计数器
 }
 
 void Graph::addEdge(int v1, int v2, double weight) {

@@ -26,6 +26,7 @@ public:
     int insertVex(const Vex& vex);               // 插入一个节点，返回节点编号
     bool removeVex(int vexNum);                  // 删除一个节点
     void clearEdges();                           // 清空所有边
+    void clearGraph();                           // **清空整个图**
     void addEdge(int v1, int v2, double weight); // 添加一条边
     void updateEdgeWeight(int v1, int v2, double weight); // 更新边的权重
     void removeEdge(int v1, int v2);             // 删除一条边
