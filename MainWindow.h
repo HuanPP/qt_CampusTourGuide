@@ -18,6 +18,7 @@
 #include <QFileDialog>
 #include <QFile>
 #include <QTextStream>
+#include <QIntValidator>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -29,7 +30,7 @@ public:
     explicit DraggableEllipseItem(int nodeId, const QString& labelText, QGraphicsItem* parent = nullptr);
 
     int getNodeId() const;
-    void updateLabelPosition(); // 更新标签位置
+    void updateLabelPosition();
 
 signals:
     void positionChanged();
@@ -41,8 +42,8 @@ protected:
 private:
     int nodeId;
     bool moved;
-    QPointF originalPosition; // 存储原始位置
-    QGraphicsTextItem* label; // 标签
+    QPointF originalPosition;
+    QGraphicsTextItem* label;
 };
 
 class MainWindow : public QMainWindow {
@@ -74,15 +75,15 @@ private:
     std::map<std::pair<int, int>, QGraphicsLineItem*> edgeItems;
     std::map<std::pair<int, int>, QGraphicsTextItem*> edgeWeightTexts;
 
-    QTimer* dfsTimer; // 定时器用于控制路径展示
-    int dfsPathIndex; // 当前展示的路径索引
-    bool isDfsRunning; // 标识是否正在展示DFS路径
-    std::vector<std::vector<int>> dfsPaths; // 存储DFS所有路径
-    void resetScene(); // 恢复场景到初始状态
+    QTimer* dfsTimer;
+    int dfsPathIndex;
+    bool isDfsRunning;
+    std::vector<std::vector<int>> dfsPaths;
+    void resetScene();
 
     void updateEdges();
     double calculateDistance(const QPointF& p1, const QPointF& p2);
-    void clearGraph(); // 清空当前图形和数据
+    void clearGraph();
 };
 
 #endif // MAINWINDOW_H

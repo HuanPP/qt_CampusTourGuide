@@ -186,6 +186,7 @@
  mdp:/opt/homebrew/Cellar/qt/6.7.3/lib/QtCore.framework/Versions/A/Headers/qprocessordetection.h
  mdp:/opt/homebrew/Cellar/qt/6.7.3/lib/QtCore.framework/Versions/A/Headers/qrect.h
  mdp:/opt/homebrew/Cellar/qt/6.7.3/lib/QtCore.framework/Versions/A/Headers/qrefcount.h
+ mdp:/opt/homebrew/Cellar/qt/6.7.3/lib/QtCore.framework/Versions/A/Headers/qregularexpression.h
  mdp:/opt/homebrew/Cellar/qt/6.7.3/lib/QtCore.framework/Versions/A/Headers/qscopedpointer.h
  mdp:/opt/homebrew/Cellar/qt/6.7.3/lib/QtCore.framework/Versions/A/Headers/qscopeguard.h
  mdp:/opt/homebrew/Cellar/qt/6.7.3/lib/QtCore.framework/Versions/A/Headers/qset.h
@@ -236,6 +237,7 @@
  mdp:/opt/homebrew/Cellar/qt/6.7.3/lib/QtCore.framework/Versions/A/Headers/qversiontagging.h
  mdp:/opt/homebrew/Cellar/qt/6.7.3/lib/QtCore.framework/Versions/A/Headers/qxptype_traits.h
  mdp:/opt/homebrew/Cellar/qt/6.7.3/lib/QtCore.framework/Versions/A/Headers/qyieldcpu.h
+ mdp:/opt/homebrew/Cellar/qt/6.7.3/lib/QtGui.framework/Versions/A/Headers/QIntValidator
  mdp:/opt/homebrew/Cellar/qt/6.7.3/lib/QtGui.framework/Versions/A/Headers/qaction.h
  mdp:/opt/homebrew/Cellar/qt/6.7.3/lib/QtGui.framework/Versions/A/Headers/qbitmap.h
  mdp:/opt/homebrew/Cellar/qt/6.7.3/lib/QtGui.framework/Versions/A/Headers/qbrush.h
@@ -267,6 +269,7 @@
  mdp:/opt/homebrew/Cellar/qt/6.7.3/lib/QtGui.framework/Versions/A/Headers/qtguiexports.h
  mdp:/opt/homebrew/Cellar/qt/6.7.3/lib/QtGui.framework/Versions/A/Headers/qtguiglobal.h
  mdp:/opt/homebrew/Cellar/qt/6.7.3/lib/QtGui.framework/Versions/A/Headers/qtransform.h
+ mdp:/opt/homebrew/Cellar/qt/6.7.3/lib/QtGui.framework/Versions/A/Headers/qvalidator.h
  mdp:/opt/homebrew/Cellar/qt/6.7.3/lib/QtGui.framework/Versions/A/Headers/qwindowdefs.h
  mdp:/opt/homebrew/Cellar/qt/6.7.3/lib/QtWidgets.framework/Versions/A/Headers/QFileDialog
  mdp:/opt/homebrew/Cellar/qt/6.7.3/lib/QtWidgets.framework/Versions/A/Headers/QGraphicsEllipseItem

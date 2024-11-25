@@ -1219,6 +1219,9 @@ CMakeFiles/CampusTourGuide.dir/MainWindow.cpp.o: \
   /opt/homebrew/lib/QtCore.framework/Headers/qfile.h \
   /opt/homebrew/lib/QtCore.framework/Headers/QTextStream \
   /opt/homebrew/lib/QtCore.framework/Headers/qtextstream.h \
+  /opt/homebrew/lib/QtGui.framework/Headers/QIntValidator \
+  /opt/homebrew/lib/QtGui.framework/Headers/qvalidator.h \
+  /opt/homebrew/include/QtCore/qregularexpression.h \
   /Users/huan/ctg/build/Desktop_arm_darwin_generic_mach_o_64bit-Debug/CampusTourGuide_autogen/include/ui_MainWindow.h \
   /opt/homebrew/include/QtCore/QVariant \
   /opt/homebrew/include/QtWidgets/QApplication \

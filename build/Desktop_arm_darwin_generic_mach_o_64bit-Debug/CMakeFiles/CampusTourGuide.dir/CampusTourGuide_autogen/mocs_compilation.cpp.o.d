@@ -1222,4 +1222,7 @@ CMakeFiles/CampusTourGuide.dir/CampusTourGuide_autogen/mocs_compilation.cpp.o: \
   /opt/homebrew/lib/QtCore.framework/Headers/qfile.h \
   /opt/homebrew/lib/QtCore.framework/Headers/QTextStream \
   /opt/homebrew/lib/QtCore.framework/Headers/qtextstream.h \
+  /opt/homebrew/lib/QtGui.framework/Headers/QIntValidator \
+  /opt/homebrew/lib/QtGui.framework/Headers/qvalidator.h \
+  /opt/homebrew/include/QtCore/qregularexpression.h \
   /opt/homebrew/include/QtCore/qtmochelpers.h

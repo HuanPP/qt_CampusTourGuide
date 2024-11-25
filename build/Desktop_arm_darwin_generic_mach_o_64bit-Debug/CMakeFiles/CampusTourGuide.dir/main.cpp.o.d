@@ -1219,6 +1219,9 @@ CMakeFiles/CampusTourGuide.dir/main.cpp.o: /Users/huan/ctg/main.cpp \
   /opt/homebrew/lib/QtCore.framework/Headers/qfile.h \
   /opt/homebrew/lib/QtCore.framework/Headers/QTextStream \
   /opt/homebrew/lib/QtCore.framework/Headers/qtextstream.h \
+  /opt/homebrew/lib/QtGui.framework/Headers/QIntValidator \
+  /opt/homebrew/lib/QtGui.framework/Headers/qvalidator.h \
+  /opt/homebrew/include/QtCore/qregularexpression.h \
   /opt/homebrew/lib/QtWidgets.framework/Headers/QApplication \
   /opt/homebrew/lib/QtWidgets.framework/Headers/qapplication.h \
   /opt/homebrew/include/QtCore/qcoreapplication.h \

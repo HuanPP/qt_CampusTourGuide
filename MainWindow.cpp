@@ -14,7 +14,6 @@
 #include <queue>
 #include <set>
 #include <algorithm>
-
 #include <QPushButton>
 #include <QLineEdit>
 #include <QTextEdit>
@@ -23,15 +22,16 @@
 #include <QTimer>
 #include <QFileDialog>
 
+// DraggableEllipseItem 类的实现
 DraggableEllipseItem::DraggableEllipseItem(int nodeId, const QString& labelText, QGraphicsItem* parent)
     : QObject(), QGraphicsEllipseItem(parent), nodeId(nodeId), moved(false) {
     setFlags(ItemIsMovable | ItemIsSelectable);
-    originalPosition = pos(); // 初始化原始位置
+    originalPosition = pos();
 
     // 创建标签并设置位置
     label = new QGraphicsTextItem(labelText, this);
     label->setDefaultTextColor(Qt::black);
-    label->setParentItem(this); // 让标签绑定在节点上
+    label->setParentItem(this);
     updateLabelPosition();
 }
 
@@ -40,7 +40,6 @@ int DraggableEllipseItem::getNodeId() const {
 }
 
 void DraggableEllipseItem::updateLabelPosition() {
-    // 设置标签在圆形节点的正中央
     qreal x = rect().x() + rect().width() / 2 - label->boundingRect().width() / 2;
     qreal y = rect().y() + rect().height() / 2 - label->boundingRect().height() / 2;
     label->setPos(x, y);
@@ -49,7 +48,7 @@ void DraggableEllipseItem::updateLabelPosition() {
 void DraggableEllipseItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
     QGraphicsEllipseItem::mouseMoveEvent(event);
     moved = true;
-    updateLabelPosition(); // 同步更新标签位置
+    updateLabelPosition();
 }
 
 void DraggableEllipseItem::mouseReleaseEvent(QGraphicsSceneMouseEvent* event) {
@@ -60,29 +59,17 @@ void DraggableEllipseItem::mouseReleaseEvent(QGraphicsSceneMouseEvent* event) {
     }
 }
 
+// MainWindow 类的实现
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent), ui(new Ui::MainWindow), scene(new QGraphicsScene(this)), dfsTimer(nullptr) {
     ui->setupUi(this);
 
     // 设置地图范围
-    scene->setSceneRect(0, 0, 800, 600); // 根据需要调整地图大小
+    scene->setSceneRect(0, 0, 800, 600);
     ui->graphView->setScene(scene);
 
-    // 连接信号和槽
-    connect(ui->addNodeButton, &QPushButton::clicked, this, &MainWindow::on_addNodeButton_clicked);
-    connect(ui->deleteNodeButton, &QPushButton::clicked, this, &MainWindow::on_deleteNodeButton_clicked);
-    connect(ui->addEdgeButton, &QPushButton::clicked, this, &MainWindow::on_addEdgeButton_clicked);
-    connect(ui->deleteEdgeButton, &QPushButton::clicked, this, &MainWindow::on_deleteEdgeButton_clicked);
+    // 连接信号和槽（仅保留必要的连接）
     connect(scene, &QGraphicsScene::selectionChanged, this, &MainWindow::on_nodeSelected);
-
-    // 连接算法按钮
-    connect(ui->findShortestPathButton, &QPushButton::clicked, this, &MainWindow::on_findShortestPathButton_clicked);
-    connect(ui->dfsButton, &QPushButton::clicked, this, &MainWindow::on_dfsButton_clicked);
-    connect(ui->mstButton, &QPushButton::clicked, this, &MainWindow::on_mstButton_clicked);
-
-    // 连接导入导出按钮
-    connect(ui->importGraphButton, &QPushButton::clicked, this, &MainWindow::on_importGraphButton_clicked);
-    connect(ui->exportGraphButton, &QPushButton::clicked, this, &MainWindow::on_exportGraphButton_clicked);
 }
 
 MainWindow::~MainWindow() {
@@ -202,11 +189,6 @@ void MainWindow::on_deleteNodeButton_clicked() {
 
 void MainWindow::on_addEdgeButton_clicked() {
     resetScene();
-    // 检查是否至少有两个节点
-    if (graph.getAllVexs().size() < 2) {
-        QMessageBox::warning(this, "警告", "节点少于2个时，无法添加边！");
-        return;
-    }
 
     QString startName = ui->edgeStartInput->text().trimmed();
     QString endName = ui->edgeEndInput->text().trimmed();
@@ -224,13 +206,8 @@ void MainWindow::on_addEdgeButton_clicked() {
         return;
     }
 
-    // 使用 find 检查节点是否已存在于 nodeItems
-    if (nodeItems.find(startId) == nodeItems.end() || nodeItems.find(endId) == nodeItems.end()) {
-        QMessageBox::warning(this, "警告", "起点或终点未正确添加到地图中！");
-        qDebug() << "nodeItems 当前状态：";
-        for (const auto& pair : nodeItems) {
-            qDebug() << "节点 ID：" << pair.first;
-        }
+    if (startId == endId) {
+        QMessageBox::warning(this, "警告", "起点和终点不能相同！");
         return;
     }
 
@@ -467,6 +444,11 @@ void MainWindow::on_dfsButton_clicked() {
 
     QString startName = ui->startPointInput->text().trimmed();
 
+    if (startName.isEmpty()) {
+        QMessageBox::warning(this, "警告", "请输入起点名称！");
+        return;
+    }
+
     int startIdx = graph.getVexIndex(startName.toStdString());
     if (startIdx == -1) {
         QMessageBox::warning(this, "警告", "起点不存在！");
@@ -633,8 +615,8 @@ void MainWindow::resetScene() {
         edgePair.second->setPen(QPen(Qt::gray, 2));
     }
 
-    isDfsRunning = false; // 标志重置
-    dfsPaths.clear();     // 清空路径
+    isDfsRunning = false;
+    dfsPaths.clear();
 }
 
 void MainWindow::on_importGraphButton_clicked() {
@@ -653,13 +635,26 @@ void MainWindow::on_importGraphButton_clicked() {
 
     QTextStream in(&file);
     int nodeCount;
-    in >> nodeCount;
-    in.readLine();
+    QString line = in.readLine();
+    bool ok;
+    nodeCount = line.trimmed().toInt(&ok);
+    if (!ok || nodeCount <= 0) {
+        QMessageBox::warning(this, "错误", "文件格式错误：节点数量无效！");
+        file.close();
+        return;
+    }
 
     // 读取节点信息
     for (int i = 0; i < nodeCount; ++i) {
-        QString nodeName = in.readLine().trimmed();
-        QString nodeInfo = in.readLine().trimmed();
+        QString nodeName = in.readLine();
+        QString nodeInfo = in.readLine();
+        if (nodeName.isNull() || nodeInfo.isNull()) {
+            QMessageBox::warning(this, "错误", "文件格式错误：节点信息不足！");
+            file.close();
+            return;
+        }
+        nodeName = nodeName.trimmed();
+        nodeInfo = nodeInfo.trimmed();
 
         // 添加节点到图结构
         Vex newVex;
@@ -689,15 +684,28 @@ void MainWindow::on_importGraphButton_clicked() {
         connect(ellipse, &DraggableEllipseItem::positionChanged, this, &MainWindow::on_sceneNodeMoved);
     }
 
-    int edgeCount;
-    in >> edgeCount;
-    in.readLine();
+    line = in.readLine();
+    int edgeCount = line.trimmed().toInt(&ok);
+    if (!ok || edgeCount < 0) {
+        QMessageBox::warning(this, "错误", "文件格式错误：边数量无效！");
+        file.close();
+        return;
+    }
 
     // 读取边信息
     for (int i = 0; i < edgeCount; ++i) {
-        QString line = in.readLine().trimmed();
-        QStringList parts = line.split(" ");
-        if (parts.size() < 2) continue;
+        QString line = in.readLine();
+        if (line.isNull()) {
+            QMessageBox::warning(this, "错误", "文件格式错误：边信息不足！");
+            file.close();
+            return;
+        }
+        QStringList parts = line.trimmed().split(" ");
+        if (parts.size() < 2) {
+            QMessageBox::warning(this, "错误", "文件格式错误：边格式不正确！");
+            file.close();
+            return;
+        }
 
         QString startName = parts[0];
         QString endName = parts[1];

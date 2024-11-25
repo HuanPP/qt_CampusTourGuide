@@ -223,6 +223,7 @@ CampusTourGuide_autogen/timestamp: \
 	/opt/homebrew/Cellar/qt/6.7.3/lib/QtCore.framework/Versions/A/Headers/qprocessordetection.h \
 	/opt/homebrew/Cellar/qt/6.7.3/lib/QtCore.framework/Versions/A/Headers/qrect.h \
 	/opt/homebrew/Cellar/qt/6.7.3/lib/QtCore.framework/Versions/A/Headers/qrefcount.h \
+	/opt/homebrew/Cellar/qt/6.7.3/lib/QtCore.framework/Versions/A/Headers/qregularexpression.h \
 	/opt/homebrew/Cellar/qt/6.7.3/lib/QtCore.framework/Versions/A/Headers/qscopedpointer.h \
 	/opt/homebrew/Cellar/qt/6.7.3/lib/QtCore.framework/Versions/A/Headers/qscopeguard.h \
 	/opt/homebrew/Cellar/qt/6.7.3/lib/QtCore.framework/Versions/A/Headers/qset.h \
@@ -273,6 +274,7 @@ CampusTourGuide_autogen/timestamp: \
 	/opt/homebrew/Cellar/qt/6.7.3/lib/QtCore.framework/Versions/A/Headers/qversiontagging.h \
 	/opt/homebrew/Cellar/qt/6.7.3/lib/QtCore.framework/Versions/A/Headers/qxptype_traits.h \
 	/opt/homebrew/Cellar/qt/6.7.3/lib/QtCore.framework/Versions/A/Headers/qyieldcpu.h \
+	/opt/homebrew/Cellar/qt/6.7.3/lib/QtGui.framework/Versions/A/Headers/QIntValidator \
 	/opt/homebrew/Cellar/qt/6.7.3/lib/QtGui.framework/Versions/A/Headers/qaction.h \
 	/opt/homebrew/Cellar/qt/6.7.3/lib/QtGui.framework/Versions/A/Headers/qbitmap.h \
 	/opt/homebrew/Cellar/qt/6.7.3/lib/QtGui.framework/Versions/A/Headers/qbrush.h \
@@ -304,6 +306,7 @@ CampusTourGuide_autogen/timestamp: \
 	/opt/homebrew/Cellar/qt/6.7.3/lib/QtGui.framework/Versions/A/Headers/qtguiexports.h \
 	/opt/homebrew/Cellar/qt/6.7.3/lib/QtGui.framework/Versions/A/Headers/qtguiglobal.h \
 	/opt/homebrew/Cellar/qt/6.7.3/lib/QtGui.framework/Versions/A/Headers/qtransform.h \
+	/opt/homebrew/Cellar/qt/6.7.3/lib/QtGui.framework/Versions/A/Headers/qvalidator.h \
 	/opt/homebrew/Cellar/qt/6.7.3/lib/QtGui.framework/Versions/A/Headers/qwindowdefs.h \
 	/opt/homebrew/Cellar/qt/6.7.3/lib/QtWidgets.framework/Versions/A/Headers/QFileDialog \
 	/opt/homebrew/Cellar/qt/6.7.3/lib/QtWidgets.framework/Versions/A/Headers/QGraphicsEllipseItem \
